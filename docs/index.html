@@ -6,27 +6,32 @@
   <title>timer</title>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet"> 
   <style>
-    body, input {
+    body {
+      background-color: orange;
+    }
+    body, input, button {
       font-family: 'IBM Plex Mono';
       font-size: 30px;
-      background-color: orange;
+    }
+    button {
+      background: none;
+      border: 1px solid red;
+      border-radius: 1em;
+      padding: 0.2em 1em;
     }
     label {
       padding-right: 1em;
     }
-    #start-time {
-      width: 5em;
+    input {
+      width: 3em;
       text-align: center;
     }
     input {
       border: none;
       border-bottom: 2px dotted red;
+      background: none;
     }
     section[role='main'] {
-      position: absolute;
-      top: 50%;
-      width: 100%;
-      margin-top: -50px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -38,24 +43,49 @@
     #counter {
       font-size: 4em;
     }
+    .hidden {
+      display: none;
+    }
+    .editor {
+      background: yellow;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 2em;
+    }
   </style>
 </head>
 <body>
-  <label for="start-time">Start Time</label><input id="start-time" type="text" value="12:00"/>
   <section role='main'>
     <span id='message'>The session will start in </span>
     <span id='counter'></span>  
   </section>
+  <aside id="editor" class="editor hidden">
+    <div>
+      <label for="start-hour">Start Hour</label>
+      <input id="start-hour" type="number" value="12" min="0" max="24"/>
+    </div>
+    <div>
+      <label for="start-minute">Start Minute</label>
+      <input id="start-minute" type="number" value="0" min="0" max="59" step="15"/>
+    </div>
+    <button class='close'>Done</button>
+  </aside>
 </body>
 <script>
   (function () {
     var counterEl = document.getElementById('counter');
+    var editEl = document.querySelector('.editor');
 
-    var startTimeEl = document.getElementById('start-time');
+    var startHourEl = document.getElementById('start-hour');
+    var startMinuteEl = document.getElementById('start-minute');
     var startTime = null;
 
     function setStartTime() {
-      var [h, m] = startTimeEl.value.split(':');
+      var h = startHourEl.value;
+      var m = startMinuteEl.value;
       var date = new Date();
       date.setHours(h);
       date.setMinutes(m);
@@ -87,12 +117,19 @@
       counterEl.innerText += padDigit(count.se);
     }
 
-    startTimeEl.addEventListener('change', setStartTime);
+    function toggleEdit() {
+      editEl.classList.toggle('hidden');
+    }
+
+    startHourEl.addEventListener('change', setStartTime);
+    startMinuteEl.addEventListener('change', setStartTime);
+    counterEl.addEventListener('click', toggleEdit);
+    editEl.querySelector('.close').addEventListener('click', toggleEdit);
 
     setStartTime();
     setInterval(function () {
       setTime();
-    }, 500);
+    }, 100);
   })();
 </script>
 </html>
