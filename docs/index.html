@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>timer</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet"> 
+  <style>
+    body, input {
+      font-family: 'IBM Plex Mono';
+      font-size: 30px;
+      background-color: orange;
+    }
+    label {
+      padding-right: 1em;
+    }
+    #start-time {
+      width: 5em;
+      text-align: center;
+    }
+    input {
+      border: none;
+      border-bottom: 2px dotted red;
+    }
+    section[role='main'] {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      margin-top: -50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    section[role='main'] > * {
+      flex-basis: content;
+    }
+    #counter {
+      font-size: 4em;
+    }
+  </style>
+</head>
+<body>
+  <label for="start-time">Start Time</label><input id="start-time" type="text" value="12:00"/>
+  <section role='main'>
+    <span id='message'>The session will start in </span>
+    <span id='counter'></span>  
+  </section>
+</body>
+<script>
+  (function () {
+    var counterEl = document.getElementById('counter');
+
+    var startTimeEl = document.getElementById('start-time');
+    var startTime = null;
+
+    function setStartTime() {
+      var [h, m] = startTimeEl.value.split(':');
+      var date = new Date();
+      date.setHours(h);
+      date.setMinutes(m);
+      date.setSeconds(0);
+      console.dir(date);
+      startTime = date.getTime();
+    }
+
+    function getCount() {
+      var currentTime = Date.now();
+      var started = currentTime > startTime;
+      var time = new Date((startTime - currentTime) * (started ? -1 : 1));
+      return {
+        started: currentTime > startTime,
+        hr: time.getUTCHours(),
+        mn: time.getUTCMinutes(),
+        se: time.getUTCSeconds(),
+      }
+    }
+
+    function padDigit(num) {
+      return num.toString().padStart(2, '0');
+    }
+
+    function setTime() {
+      var count = getCount();
+      counterEl.innerText = padDigit(count.hr) + ':';
+      counterEl.innerText += padDigit(count.mn) + ':';
+      counterEl.innerText += padDigit(count.se);
+    }
+
+    startTimeEl.addEventListener('change', setStartTime);
+
+    setStartTime();
+    setInterval(function () {
+      setTime();
+    }, 500);
+  })();
+</script>
+</html>
